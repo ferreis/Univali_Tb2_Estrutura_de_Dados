@@ -14,7 +14,6 @@ bool
 inserirHashLivro(ListaLivros lista[], int matriculaLivro, int matriculaAutor, int matriculaEditora, string titulo,
                  string assunto) { ///insere dentro do HASH
     int chaveLivro = calcularEndereco(matriculaLivro);
-    int chaveAutor = calcularEndereco(matriculaAutor);
     return inserirLivro(lista[chaveLivro], matriculaLivro, matriculaAutor, matriculaEditora, titulo, assunto);
 }
 
@@ -94,54 +93,49 @@ void cadastros(ListaLivros *listaLivros, ListaRevistas *listaRevistas, ListaAuto
 
 void pesquisa(ListaLivros *listaLivros, ListaRevistas *listaRevistas, ListaAutores *listaAutores,
               ListaEditoras *listaEditoras, ListaUsuarios *listaUsuarios) {
-    int matricula, op;
-    int chave = calcularEndereco(matricula);
-    cout << "Qual Matricula deseja buscar: " << endl;
+    int matricula;
+
+
+    string texto;
+    cout << "informer Matricula, titulo, autor, editora ou assunto que deseja buscar: " << endl;
     cin >> matricula;
-    do {
-        system("cls");
-        cout << "Oque quer fazer: " << endl;
-        cout << "\t1. Buscar por Matricula: " << endl;
-        cout << "\t0. Fim" << endl;
-        cin >> op;
-        switch (op) {
-            case 1:
-                if (buscarHashLivros(listaLivros, matricula)) {
-                    cout << "Matricula: " << buscarLivro(listaLivros[chave], matricula)->matricula;
-                    cout << " - Titulo: " << buscarLivro(listaLivros[chave], matricula)->titulo;
-                    cout << " - Assunto: " << buscarLivro(listaLivros[chave], matricula)->assunto;
-                }
-                if (buscarHashRevitas(listaRevistas, matricula)) {
-                    cout << "Matricula: " << buscarRevista(listaRevistas[chave], matricula)->matricula;
-                    cout << " - Titulo: " << buscarRevista(listaRevistas[chave], matricula)->titulo;
-                    cout << " - Assunto: " << buscarRevista(listaRevistas[chave], matricula)->assunto;
-                }
-                if (buscarHashAutores(listaAutores, matricula)) {
-                    cout << "Matricula: " << buscarAutor(listaAutores[chave], matricula)->matricula;
-                    cout << " - Cadastro: " << buscarAutor(listaAutores[chave], matricula)->nome << endl;
-                    system("pause");
-                }
-                if (buscarHashEditoras(listaEditoras, matricula)) {
-                    cout << "Matricula: " << buscarEditora(listaEditoras[chave], matricula)->matricula;
-                    cout << " - Titulo: " << buscarEditora(listaEditoras[chave], matricula)->nome;
-                    system("pause");
-                }
-                if (buscarHashUsuarios(listaUsuarios, matricula)) {
-                    cout << "Matricula: " << buscarUsuario(listaUsuarios[chave], matricula)->matricula;
-                    cout << " - Nome de usuario: " << buscarUsuario(listaUsuarios[chave], matricula)->nome;
-                }
-                system("pause");
-                break;
-            case 2:
-
-                break;
-        }
-
-    } while (op != 0);
-    cout << endl;
+    int chave = calcularEndereco(matricula);
+    system("cls");
+    if (buscarLivro(listaLivros[chave], matricula)->matricula == matricula ||
+        buscarLivro(listaLivros[chave], matricula)->titulo == texto ||
+        buscarLivro(listaLivros[chave], matricula)->assunto == texto) {
+        cout << "Matricula: " << buscarLivro(listaLivros[chave], matricula)->matricula;
+        cout << " - Titulo: " << buscarLivro(listaLivros[chave], matricula)->titulo;
+        cout << " - Assunto: " << buscarLivro(listaLivros[chave], matricula)->assunto;
+    }
+    if (buscarRevista(listaRevistas[chave], matricula)->matricula == matricula ||
+        buscarRevista(listaRevistas[chave], matricula)->titulo == texto ||
+        buscarRevista(listaRevistas[chave], matricula)->assunto == texto) {
+        cout << "Matricula: " << buscarRevista(listaRevistas[chave], matricula)->matricula;
+        cout << " - Titulo: " << buscarRevista(listaRevistas[chave], matricula)->titulo;
+        cout << " - Assunto: " << buscarRevista(listaRevistas[chave], matricula)->assunto;
+    }
+    if (buscarAutor(listaAutores[chave], matricula)->matricula == matricula ||
+        buscarAutor(listaAutores[chave], matricula)->nome == texto) {
+        cout << "Matricula: " << buscarAutor(listaAutores[chave], matricula)->matricula;
+        cout << " - Cadastro: " << buscarAutor(listaAutores[chave], matricula)->nome << endl;
+        system("pause");
+    }
+    if (buscarEditora(listaEditoras[chave], matricula)->matricula == matricula ||
+        buscarEditora(listaEditoras[chave], matricula)->nome == texto) {
+        cout << "Matricula: " << buscarEditora(listaEditoras[chave], matricula)->matricula;
+        cout << " - Titulo: " << buscarEditora(listaEditoras[chave], matricula)->nome;
+        system("pause");
+    }
+    if (buscarUsuario(listaUsuarios[chave], matricula)->matricula == matricula ||
+        buscarUsuario(listaUsuarios[chave], matricula)->nome == texto) {
+        cout << "Matricula: " << buscarUsuario(listaUsuarios[chave], matricula)->matricula;
+        cout << " - Nome de usuario: " << buscarUsuario(listaUsuarios[chave], matricula)->nome;
+    }
+    system("pause");
 }
 
-void mostrarLivroEAutor(ListaLivros &listaLivros, ListaAutores *listaAutores, ListaEditoras *listaEditoras) {
+void mostrarDetalhadoLivro(ListaLivros &listaLivros, ListaAutores *listaAutores, ListaEditoras *listaEditoras) {
     std::cout << "Livros:" << std::endl;
     Livro *auxLivro = listaLivros.inicio;
     while (auxLivro != nullptr) {
@@ -220,7 +214,7 @@ int main() {
                 cout << "Tabela: " << endl;
                 for (int i = 0; i < TAM; ++i) {
                     cout << i << "- ";
-                    mostrarLivroEAutor(listaLivros[i], listaAutores, listaEditoras);
+                    mostrarDetalhadoLivro(listaLivros[i], listaAutores, listaEditoras);
                     //mostrarLivro(listaLivros[i], " ");
                     cout << endl;
                 }

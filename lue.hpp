@@ -1,7 +1,7 @@
 ///TRABALHO FEITO PELOS ALUNOS: RAFAEL FERNANDO DOS REIS MECABÔ, MATHEUS ARMANDO TIMM BARBIERI
 #include <iostream>
 
-struct Livro {
+struct  Livro {
     int matricula;
     int autor;
     int editora;
