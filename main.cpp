@@ -1,3 +1,4 @@
+///TRABALHO FEITO PELOS ALUNOS: RAFAEL FERNANDO DOS REIS MECABÔ, MATHEUS ARMANDO TIMM BARBIERI
 #include <iostream>
 #include "utils.hpp"
 #include "lue.hpp"
@@ -56,9 +57,7 @@ int main() {
         cout << "Oque quer fazer: " << endl;
         cout << "\t1. Cadastros" << endl;
         cout << "\t2. Pesquisar " << endl;
-        cout << "\t3. Testes " << endl;
-        cout << "\t9. Mostrar tudo" << endl;
-        cout << "\t10.Cadastro testes" << endl;
+        cout << "\t3. Mostrar tudo " << endl;
         cout << "\t0. Fim" << endl;
         cin >> op;
         int opcao;
@@ -67,7 +66,7 @@ int main() {
                 cout << "Digite uma matricula caracteres: " << endl;
                 cin >> input;
 
-                cout << "Oque quer pesquisar: " << endl;
+                cout << "Oque quer cadastrar: " << endl;
                 cout << "\t1. Livro" << endl;
                 cout << "\t2. Revista" << endl;
                 cout << "\t3. Autor" << endl;
@@ -103,6 +102,7 @@ int main() {
                     if (buscarHashMatricula(listaLivros, input)) {
                         std::cout << "Livro encontrado: " << std::endl;
                         // Faça algo com livroEncontrado
+
                     } else {
                         std::cout << "Livro não encontrado." << std::endl;
                     }
@@ -141,8 +141,12 @@ int main() {
             case 3:
                 cout << "Tabela completa" << endl;
                 for (int i = 0; i < TAM; i++) {
-                    cout << "\t"<< i << "Livros:" << std::endl;;
+                    cout << "\t"<< i << " Livros:" << std::endl;;
                     mostrarLista(listaLivros[i]);
+                    mostrarLista(listaRevistas[i]);
+                    mostrarLista(listaAutores[i]);
+                    mostrarLista(listaEditoras[i]);
+                    mostrarLista(listaUsuarios[i]);
                     cout << endl;
                 }
                 system("pause");
@@ -158,9 +162,6 @@ int main() {
                 }
 
                 system("pause");
-                break;
-            case 10:
-
                 break;
             default:
                 cout << "Opcao invalida!" << endl;
