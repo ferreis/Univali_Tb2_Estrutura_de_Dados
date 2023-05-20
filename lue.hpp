@@ -1,140 +1,184 @@
 ///TRABALHO FEITO PELOS ALUNOS: RAFAEL FERNANDO DOS REIS MECABÔ, MATHEUS ARMANDO TIMM BARBIERI
 #include <iostream>
+#include "utils.hpp"
 
-struct  Livro {
+template<typename T>
+struct No {
+    T valor;
+    No<T> *proximo;
+};
+
+template<typename T>
+struct Lista {
+    No<T> *inicio;
+    No<T> *fim;
+};
+
+struct Livro {
     int matricula;
     int autor;
     int editora;
-    std::string titulo;
-    std::string assunto;
-    Livro *proximo;
+    string nome;
+    string assunto;
+    No<Livro> *proximo;
 };
 
-struct ListaLivros {
-    Livro *inicio;
-    Livro *fim;
-};
 
 struct Revista {
     int matricula;
     int editora;
-    std::string titulo;
+    int autor;
+    std::string nome;
     std::string assunto;
-    Revista *proximo;
-};
-
-struct ListaRevistas {
-    Revista *inicio;
-    Revista *fim;
+    No<Revista> *proximo;
 };
 
 struct Autor {
     int matricula;
-    std::string nome;
-    Autor *proximo;
-    ListaLivros listaLivros;
-};
-
-struct ListaAutores {
-    Autor *inicio;
-    Autor *fim;
+    string nome;
+    No<Autor> *proximo;
+    Lista<Livro> listaLivros;
 };
 
 struct Editora {
     int matricula;
     int autor;
     std::string nome;
-    Editora *proximo;
-    ListaRevistas listaRevistas;
-};
-
-struct ListaEditoras {
-    Editora *inicio;
-    Editora *fim;
+    No<Editora> *proximo;
+    Lista<Autor> listaaAutores;
+    Lista<Revista> listaRevistas;
 };
 
 struct Usuario {
     int matricula;
     std::string nome;
-    Usuario *proximo;
+    No<Usuario> *proximo;
 };
 
-struct ListaUsuarios {
-    Usuario *inicio;
-    Usuario *fim;
-};
 
-void inicializarListas(ListaLivros &listaLivros, ListaRevistas &listaRevistas,
-                       ListaAutores &listaAutores, ListaEditoras &listaEditoras, ListaUsuarios &listaUsuarios) {
-    listaLivros.inicio = nullptr;
-    listaLivros.fim = nullptr;
-    listaRevistas.inicio = nullptr;
-    listaRevistas.fim = nullptr;
-    listaAutores.inicio = nullptr;
-    listaAutores.fim = nullptr;
-    listaEditoras.inicio = nullptr;
-    listaEditoras.fim = nullptr;
-    listaUsuarios.inicio = nullptr;
-    listaUsuarios.fim = nullptr;
+template<typename T>
+void inicializarLista(Lista<T> &lista) {
+    lista.inicio = nullptr;
+    lista.fim = nullptr;
+
 }
 
-
-//Buscadores por martricula
-Livro *buscarLivro(ListaLivros lst, int matricula) {
-    Livro *aux = lst.inicio;
+template<typename T>
+void mostrarLista(Lista<T> lista) {
+    No<T> *aux = lista.inicio;
     while (aux != nullptr) {
-        if (aux->matricula == matricula) {
-            return aux;
-        }
+        std::cout << "\t|->________________________________________________: " << endl;
+        cout<< "\t"<< aux->valor.matricula << " - ";
+        std::cout << "\t|->Titulo: " << aux->valor.nome;
+
         aux = aux->proximo;
+    }
+    cout << endl;
+}
+//buscadores
+template<typename T>
+No<T> *buscarMatricula(Lista<T> &lista, string info) {
+    No<T> *aux = lista.inicio;
+    if (validaString(info)) {
+        int matricula = stoi(info);
+        while (aux != nullptr) {
+            if (aux->valor.matricula == matricula) {
+                return
+                        aux;
+            }
+            aux = aux->proximo;
+
+        }
     }
     return nullptr;
 }
 
-Revista *buscarRevista(ListaRevistas lst, int matricula) {
-    Revista *aux = lst.inicio;
-    while (aux != nullptr) {
-        if (aux->matricula == matricula) {
-            return aux;
-        }
-        aux = aux->proximo;
+template<typename T>
+T obterInformacoes(int matricula) {
+    T objeto;
+    objeto.matricula = matricula;
+
+    if constexpr (std::is_same<T, Livro>::value) {
+        cout << "Digite a matricula do autor: ";
+        cin >> objeto.autor;
+        cout << "Digite a matricula da editora: ";
+        cin >> objeto.editora;
+        cout << "Digite o titulo do livro: ";
+        cin >> objeto.nome;
+        cout << "Digite o assunto do livro: ";
+        cin >> objeto.assunto;
+    } else if constexpr (std::is_same<T, Revista>::value) {
+        cout << "Digite a matricula da editora: ";
+        cin >> objeto.editora;
+        cout << "Digite o titulo da revista: ";
+        cin >> objeto.nome;
+        cout << "Digite o assunto da revista: ";
+        cin >> objeto.assunto;
+    } else if constexpr (std::is_same<T, Autor>::value) {
+        cout << "Digite o nome do autor: ";
+        cin >> objeto.nome;
+    } else if constexpr (std::is_same<T, Editora>::value) {
+        cout << "Digite a matricula do autor: ";
+        cin >> objeto.autor;
+        cout << "Digite o nome da editora: ";
+        cin >> objeto.nome;
+    } else if constexpr (std::is_same<T, Usuario>::value) {
+        cout << "Digite o nome do usuario: ";
+        cin >> objeto.nome;
     }
-    return nullptr;
+
+    return objeto;
 }
 
-Autor *buscarAutor(ListaAutores lst, int matricula) {
-    Autor *aux = lst.inicio;
-    while (aux != nullptr) {
-        if (aux->matricula == matricula) {
-            return aux;
-        }
-        aux = aux->proximo;
+template<typename T>
+bool inserir(Lista<T> &lst, string info) {
+    cout << "inserindo" << endl;
+    No<T> *novo = new No<T>();
+    if (novo == nullptr) {
+        return false;
     }
-    return nullptr;
+
+    int matricula = stoi(info);
+    T valor = obterInformacoes<T>(matricula);
+    novo->valor = valor;
+    novo->proximo = nullptr;
+
+    // Verifica se a lista está vazia
+    if (lst.inicio == nullptr) {
+        lst.inicio = novo;
+        lst.fim = novo;
+        return true;
+    }
+
+    // Inserir no início da lista
+    if (matricula < lst.inicio->valor.matricula) {
+        novo->proximo = lst.inicio;
+        lst.inicio = novo;
+        return true;
+    }
+
+    // Inserir no final da lista
+    if (matricula > lst.fim->valor.matricula) {
+        lst.fim->proximo = novo;
+        lst.fim = novo;
+        return true;
+    }
+
+    // Inserir no meio da lista
+    No<T> *anterior = lst.inicio;
+    while (anterior->proximo != nullptr && anterior->proximo->valor.matricula < matricula) {
+        anterior = anterior->proximo;
+    }
+    novo->proximo = anterior->proximo;
+    anterior->proximo = novo;
+    return true;
 }
 
-Editora *buscarEditora(ListaEditoras lst, int matricula) {
-    Editora *aux = lst.inicio;
-    while (aux != nullptr) {
-        if (aux->matricula == matricula) {
-            return aux;
-        }
-        aux = aux->proximo;
-    }
-    return nullptr;
-}
 
-Usuario *buscarUsuario(ListaUsuarios lst, int matricula) {
-    Usuario *aux = lst.inicio;
-    while (aux != nullptr) {
-        if (aux->matricula == matricula) {
-            return aux;
-        }
-        aux = aux->proximo;
-    }
-    return nullptr;
-}
-//
+
+
+
+/*
 
 void mostrarLivro(ListaLivros &lista, char frase[]) {
     std::cout << frase << ": ";
@@ -147,56 +191,43 @@ void mostrarLivro(ListaLivros &lista, char frase[]) {
     }
 }
 
-bool
-inserirLivro(ListaLivros &listaLivros, int matriculaLivro, int matriculaAutor, int matriculaEditora, std::string titulo,
-             std::string assunto) {
-    Livro *novo = new Livro;
+bool inserirRevista(ListaRevistas &revistas, string info) {
+    Revista *novo = revistas.inicio;
     if (novo == nullptr) {
         return false;
     }
+    int matriculaRevista, matriculaAutor, matriculaEditora;
+    string titulo, assunto;
+    matriculaRevista = stoi(info);
+    cout << "Digite a matricula do autor: ";
+    cin >> matriculaAutor;
+    cout << "Digite a matricula da editora: ";
+    cin >> matriculaEditora;
+    cout << "Digite o titulo da revista: ";
+    cin >> titulo;
+    cout << "Digite o assunto da revista: ";
+    cin >> assunto;
 
-    novo->matricula = matriculaLivro;
+    novo->matricula = matriculaRevista;
     novo->autor = matriculaAutor;
     novo->editora = matriculaEditora;
     novo->titulo = titulo;
     novo->assunto = assunto;
     novo->proximo = nullptr;
 
-    //Verifica se a novo é menor que o livro do começo
-    if (listaLivros.inicio == nullptr) {
-        listaLivros.inicio = novo;
-        listaLivros.fim = novo;
-        return true;
-    }
-
-    // Inserir no inicio da lista
-    if (matriculaLivro < listaLivros.inicio->matricula) {
-        novo->proximo = listaLivros.inicio;
-        listaLivros.inicio = novo;
-        return true;
-    }
-
-    // Inserir no final da lista
-    if (matriculaLivro > listaLivros.fim->matricula) {
-        listaLivros.fim->proximo = novo;
-        listaLivros.fim = novo;
-        return true;
-    }
-
-    // Inserir no meio da lista
-    Livro *aux = listaLivros.inicio;
-    while (aux->matricula < matriculaLivro && aux->proximo->matricula < matriculaLivro)
-        aux = aux->proximo;
-    novo->proximo = aux->proximo;
-    aux->proximo = novo;
-    return true;
+    return false;
 }
 
-bool inserirAutor(ListaAutores &listaAutores, int matriculaAutor, std::string nome) {
-    Autor *novo = new Autor;
+bool inserirAutor(ListaAutores &listaAutores, std::string info) {
+    Autor *novo = listaAutores.inicio;
     if (novo == nullptr) {
         return false;
     }
+    int matriculaAutor;
+    string nome;
+    matriculaAutor = stoi(info);
+    cout << "Digite o nome do autor: ";
+    cin >> nome;
 
     novo->matricula = matriculaAutor;
     novo->nome = nome;
@@ -230,6 +261,92 @@ bool inserirAutor(ListaAutores &listaAutores, int matriculaAutor, std::string no
     return true;
 }
 
+bool inserirEditora(ListaEditoras &listaEditoras, std::string info) {
+    Editora *novo = listaEditoras.inicio;
+    if (novo == nullptr) {
+        return false;
+    }
+    int matriculaEditora;
+    string nome;
+    matriculaEditora = stoi(info);
+    cout << "Digite o nome da editora: ";
+    cin >> nome;
+
+    novo->matricula = matriculaEditora;
+    novo->nome = nome;
+    novo->proximo = nullptr;
+
+    // Adiciona a editora na lista de editoras
+    if (listaEditoras.inicio == nullptr) {
+        listaEditoras.inicio = novo;
+        listaEditoras.fim = novo;
+    }
+
+    // Inserir no inicio da lista
+    if (matriculaEditora < listaEditoras.inicio->matricula) {
+        novo->proximo = listaEditoras.inicio;
+        listaEditoras.inicio = novo;
+        return true;
+    }
+
+    // Inserir no final da lista
+    if (matriculaEditora > listaEditoras.fim->matricula) {
+        listaEditoras.fim->proximo = novo;
+        listaEditoras.fim = novo;
+        return true;
+    }
+
+    Editora *aux = listaEditoras.inicio;
+    while (aux->matricula < matriculaEditora && aux->proximo->matricula < matriculaEditora)
+        aux = aux->proximo;
+    novo->proximo = aux->proximo;
+    aux->proximo = novo;
+    return true;
+}
+
+bool inserirUsuario(ListaUsuarios &listaUsuarios, std::string info) {
+    Usuario *novo = listaUsuarios.inicio;
+    if (novo == nullptr) {
+        return false;
+    }
+    int matriculaUsuario;
+    string nome;
+    matriculaUsuario = stoi(info);
+    cout << "Digite o nome do usuario: ";
+    cin >> nome;
+
+    novo->matricula = matriculaUsuario;
+    novo->nome = nome;
+    novo->proximo = nullptr;
+
+    // Adiciona o usuario na lista de usuarios
+    if (listaUsuarios.inicio == nullptr) {
+        listaUsuarios.inicio = novo;
+        listaUsuarios.fim = novo;
+    }
+
+    // Inserir no inicio da lista
+    if (matriculaUsuario < listaUsuarios.inicio->matricula) {
+        novo->proximo = listaUsuarios.inicio;
+        listaUsuarios.inicio = novo;
+        return true;
+    }
+
+    // Inserir no final da lista
+    if (matriculaUsuario > listaUsuarios.fim->matricula) {
+        listaUsuarios.fim->proximo = novo;
+        listaUsuarios.fim = novo;
+        return true;
+    }
+
+    Usuario *aux = listaUsuarios.inicio;
+    while (aux->matricula < matriculaUsuario && aux->proximo->matricula < matriculaUsuario)
+        aux = aux->proximo;
+    novo->proximo = aux->proximo;
+    aux->proximo = novo;
+    return true;
+}
+
 bool retirarAutores(ListaAutores &lista, int matricula) {
     Autor *ant = nullptr, *pos;
 
@@ -253,7 +370,7 @@ bool retirarAutores(ListaAutores &lista, int matricula) {
 }
 
 void alterarNomeAutor(ListaAutores &lista, int matricula, std::string novoNome) {
-    Autor *autor = buscarAutor(lista, matricula);
+    Autor *autor = buscarMatricula<ListaAutores>(lista, matricula);
     if (autor != nullptr) {
         autor->nome = novoNome;
         std::cout << "Nome do autor alterado com sucesso" << std::endl;
@@ -261,3 +378,74 @@ void alterarNomeAutor(ListaAutores &lista, int matricula, std::string novoNome) 
         std::cout << "Autor nao encontrado" << std::endl;
     }
 }
+
+
+void *buscarLivroGeral(Lista lst, std::string info) {
+    Livro *aux = lst.inicio;
+    while (aux != nullptr) {
+        if (aux->titulo == info || aux->assunto == info) {
+            std::cout << "Matricula: " << aux->matricula;
+            std::cout << " - Titulo: " << aux->titulo;
+            std::cout << " - Assunto: " << aux->assunto;
+            system("pause");
+
+        }
+        aux = aux->proximo;
+    }
+    return nullptr;
+}
+
+void *buscarRevistaGeral(ListaRevistas lst, std::string info) {
+    Revista *aux = lst.inicio;
+
+    while (aux != nullptr) {
+        if (aux->titulo == info || aux->assunto == info) {
+            std::cout << "Matricula: " << aux->matricula;
+            std::cout << " - Titulo: " << aux->titulo;
+            std::cout << " - Assunto: " << aux->assunto;
+            system("pause");
+        }
+        aux = aux->proximo;
+    }
+    return nullptr;
+}
+
+Autor *buscarAutorGeral(ListaAutores &lst, const std::string info) {
+    Autor *aux = lst.inicio;
+    while (aux != nullptr) {
+        if (validarUppercase(aux->nome) == validarUppercase(info)) {
+            return aux;
+        }
+        aux = aux->proximo;
+    }
+    return nullptr;
+
+}
+
+void *buscarEditoraGeral(ListaEditoras lst, std::string info) {
+    Editora *aux = lst.inicio;
+    while (aux != nullptr) {
+        if (aux->nome == info) {
+            std::cout << "Matricula: " << aux->matricula;
+            std::cout << " - Titulo: " << aux->nome;
+            system("pause");
+        }
+        aux = aux->proximo;
+    }
+    return nullptr;
+}
+
+template<typename T>
+void *buscarUsuarioGeral(T lst, std::string info) {
+    T *aux = lst.inicio;
+    while (aux != nullptr) {
+        if (aux->nome == info) {
+            std::cout << "Matricula: " << aux->matricula;
+            std::cout << " - Titulo: " << aux->nome;
+            system("pause");
+        }
+        aux = aux->proximo;
+    }
+    return nullptr;
+};
+ */
