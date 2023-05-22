@@ -290,11 +290,6 @@ void vincularLivrosAutores(Lista<Livro> *listaLivros, Lista<Autor> *listaAutores
     }
 }
 
-// Função para mostrar os livros/revistas de um autor ou editora
-void RelatorioLivRevAutEdi(Lista<Livro> listaLivros[], Lista<Revista> listaRevistas[], Lista<Autor> listaAutores[],
-                           Lista<Editora> listaEditoras[]) {
-
-}
 
 void retirarLivro(Usuario &usuario, Livro &livro, Data &data1) {
 

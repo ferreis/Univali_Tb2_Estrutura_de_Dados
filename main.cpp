@@ -182,7 +182,8 @@ int main() {
         cout << "10 - Buscar usuário por matrícula" << endl;
         cout << "11 - Listas simples" << endl;
         cout << "12 - Alugar um livro/revista" << endl;
-        cout << "13 - Sair" << endl;
+        cout << "13 - Alterar cadastro" << endl;
+        cout << "14 - Sair" << endl;
         cout << "---------------------------------------------" << endl;
 
         cout << "Digite sua opção: ";
@@ -194,25 +195,22 @@ int main() {
                 string matricula;
                 cout << "Digite a matrícula do livro: ";
                 cin >> matricula;
-
                 if (validaString(matricula)) {
                     Livro livro;
                     cin.ignore();
                     cout << "Digite o nome do livro: ";
                     getline(cin, livro.nome);
-                    cin.ignore();
                     cout << "Digite o assunto do livro: ";
                     getline(cin, livro.extra);
-                    cin.ignore();
                     cout << "Digite o id do autor: ";
                     cin >> livro.idAutor;
                     cin.ignore();
                     cout << "Digite o id da editora: ";
                     cin >> livro.editora;
+                    system("pause");
                     int chaveLivro = calcularEndereco(stoi(matricula));
                     int chaveAutor = calcularEndereco(livro.idAutor);
                     inserirHashGeral(listaLivros, matricula, livro);
-
                     vincularLivrosAutor(listaLivros[chaveLivro], listaAutores[chaveAutor]);
                 } else {
                     cout << "Entrada inválida." << endl;
@@ -221,6 +219,7 @@ int main() {
                 break;
             }
             case 2: {//inserir revista
+
                 string matricula;
                 cout << "Digite a matrícula da revista: ";
                 cin >> matricula;
@@ -370,15 +369,15 @@ int main() {
                 cout << "Listas simples:  " << endl;
                 for (int i = 0; i < TAM; ++i) {
                     cout << "Lista " << i << ": " << endl;
-                    cout << "Livros|-> "<< endl;
+                    cout << "Livros|-> " << endl;
                     mostrarLista(listaLivros[i]);
-                    cout << "Revista|->  "<< endl;
+                    cout << "Revista|->  " << endl;
                     mostrarLista(listaRevistas[i]);
-                    cout << "Autores|->  "<< endl;
+                    cout << "Autores|->  " << endl;
                     mostrarLista(listaAutores[i]);
-                    cout << "Editoras|->  "<< endl;
+                    cout << "Editoras|->  " << endl;
                     mostrarLista(listaEditoras[i]);
-                    cout << "Usuarios|->  "<< endl;
+                    cout << "Usuarios|->  " << endl;
                     mostrarLista(listaUsuarios[i]);
                 }
                 break;
@@ -437,10 +436,16 @@ int main() {
 
                 break;
             }
+            case 13: {
+
+                break;
+            }
             default:
                 cout << "Opção inválida." << endl;
         }
-    } while (op != 13);
+
+    } while (op != 14);
+
 
     return 0;
 }
