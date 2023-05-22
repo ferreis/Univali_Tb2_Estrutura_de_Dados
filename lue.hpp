@@ -1,131 +1,100 @@
 ///TRABALHO FEITO PELOS ALUNOS: RAFAEL FERNANDO DOS REIS MECABÔ, MATHEUS ARMANDO TIMM BARBIERI
 #include <iostream>
 #include "utils.hpp"
+#include <ctime>
+
+#define TAM = 16
 struct Autor;
+
 template<typename T>
 struct No {
     T valor;
     No<T> *proximo;
 };
-
 template<typename T>
 struct Lista {
     No<T> *inicio;
     No<T> *fim;
 };
-
 struct Livro {
     int matricula;
-    int autor;
+    int idAutor;
     int editora;
     string nome;
-    string assunto;
+    string extra;
     No<Livro> *proximo;
+    Data dataRetirada;
 };
-
-
 struct Revista {
     int matricula;
     int editora;
-    std::string nome;
-    std::string assunto;
+    string nome;
+    string extra;
     No<Revista> *proximo;
+    Data dataRetirada;
 };
-
 struct Autor {
     int matricula;
     string nome;
+    string extra;
     No<Autor> *proximo;
     Lista<Livro> listaLivros;
 };
-
 struct Editora {
     int matricula;
-    int autor;
-    std::string nome;
+    string nome;
+    string extra;
     No<Editora> *proximo;
-    Lista<Autor> listaaAutores;
+    Lista<Autor> listaAutores;
     Lista<Revista> listaRevistas;
+    Lista<Livro> listaLivros;
 };
-
 struct Usuario {
     int matricula;
-    std::string nome;
+    string nome;
+    string extra;
     No<Usuario> *proximo;
+    Livro *livroRetirado;
+    Revista *listaRevistas;
 };
-
 
 template<typename T>
 void inicializarLista(Lista<T> &lista) {
     lista.inicio = nullptr;
     lista.fim = nullptr;
-
 }
 
-
-//buscadores
 template<typename T>
-No<T> *buscarMatricula(Lista<T> &lista, string info) {
-    No<T> *aux = lista.inicio;
-    if (validaString(info)) {
-        int matricula = stoi(info);
-        while (aux != nullptr) {
-            if (aux->valor.matricula == matricula) {
-                return aux;
-            }
-            aux = aux->proximo;
+T *buscarElemento(Lista<T> &lista, int matricula) {
+    No<T> *atual = lista.inicio;
+    while (atual != nullptr) {
+        if (atual->valor.matricula == matricula) {
+            return &(atual->valor);
         }
+        atual = atual->proximo;
     }
-    return nullptr;
+    return nullptr; // Elemento não encontrado
 }
 
 template<typename T>
-T obterInformacoes(int matricula) {
-    T objeto;
-    objeto.matricula = matricula;
-
-    if constexpr (std::is_same<T, Livro>::value) {
-        cout << "Digite a matricula do autor: ";
-        cin >> objeto.autor;
-        cout << "Digite a matricula da editora: ";
-        cin >> objeto.editora;
-        cout << "Digite o titulo do livro: ";
-        cin >> objeto.nome;
-        cout << "Digite o assunto do livro: ";
-        cin >> objeto.assunto;
-    } else if constexpr (std::is_same<T, Revista>::value) {
-        cout << "Digite a matricula da editora: ";
-        cin >> objeto.editora;
-        cout << "Digite o titulo da revista: ";
-        cin >> objeto.nome;
-        cout << "Digite o assunto da revista: ";
-        cin >> objeto.assunto;
-    } else if constexpr (std::is_same<T, Autor>::value) {
-        cout << "Digite o nome do autor: ";
-        cin >> objeto.nome;
-    } else if constexpr (std::is_same<T, Editora>::value) {
-        cout << "Digite a matricula do autor: ";
-        cin >> objeto.autor;
-        cout << "Digite o nome da editora: ";
-        cin >> objeto.nome;
-    } else if constexpr (std::is_same<T, Usuario>::value) {
-        cout << "Digite o nome do usuario: ";
-        cin >> objeto.nome;
+No<T> *buscarLista(Lista<T> lista, int valor) {
+    No<T> *aux = lista.inicio;
+    while (aux != NULL) {
+        if (aux->valor.matricula == valor) return aux;
+        aux = aux->valor.proximo;
     }
-
-    return objeto;
+    return NULL;
 }
 
-template<typename T>
-bool inserir(Lista<T> &lst, string info) {
-    cout << "inserindo" << endl;
-    No<T> *novo = new No<T>();
+template<typename T, typename T2>
+bool inserir(Lista<T> &lst, string info, T2 cadastro) {
+    No<T> *novo = new No<T>;
     if (novo == nullptr) {
         return false;
     }
 
     int matricula = stoi(info);
-    T valor = obterInformacoes<T>(matricula);
+    T valor = cadastro;
     novo->valor = valor;
     novo->proximo = nullptr;
 
@@ -160,31 +129,196 @@ bool inserir(Lista<T> &lst, string info) {
     return true;
 }
 
-template<typename T>
-void mostrarLista(Lista<T> lista) {
-    No<T> *aux = lista.inicio;
-    while (aux != nullptr) {
-        std::cout << "\t|->________________________________________________: " << endl;
-        cout << "\t Matricula:" << aux->valor.matricula << " - ";
-        std::cout << "\t|->Titulo: " << aux->valor.nome;
-        if (std::is_same<T, Livro>::value){//livro
-            cout << "\t|->Assunto: " << aux->valor.assunto;
-            cout << "\t|->Autor: " << aux->valor.autor;
-            cout << "\t|->Autor: " << buscarMatricula(aux->valor.autor, aux->valor.autor).valor.nome;
-            cout << "\t|->Editora: " << aux->valor.editora;
-            cout << "\t|->Editora: " << buscarMatricula(aux->valor.editora, aux->valor.editora).valor.nome;
-        }else if(std::is_same<T, Revista>::value){//revista
-            cout << "\t|->Editora: " << aux->valor.editora;
-            cout << "\t|->Assunto: " << aux->valor.assunto;
-        }else if (std::is_same<T, Editora>::value){//editora
-            cout << "\t|->Autor: " << aux->valor.autor;
-        }else if (std::is_same<T, Autor>::value) {//autor
-            cout << "\t|->Nome: " << aux->valor.nome;
+void inserir(No<Livro> *livro, Lista<Livro> &lista) {
+    if (lista.inicio == nullptr) {
+        lista.inicio = livro;
+        livro->proximo = nullptr;
+    } else {
+        No<Livro> *ultimo = lista.inicio;
+        while (ultimo->proximo != nullptr) {
+            ultimo = ultimo->proximo;
         }
-        aux = aux->proximo;
+        ultimo->proximo = livro;
+        livro->proximo = nullptr;
     }
 }
 
+template<typename T>
+T obterInformacoes(string matricula) {
+    T objeto;
 
+    cout << "Digite as informações do objeto com a matrícula " << matricula << ":" << endl;
+    cout << "Nome: ";
+    cin.ignore();
+    getline(cin, objeto.nome);
+    cout << "Extra: ";
+    getline(cin, objeto.extra);
 
+    // Preencha os campos adicionais específicos de cada tipo
+    if constexpr (is_same<T, Livro>::value) {
+        cout << "Matrícula: ";
+        cin >> objeto.matricula;
+        cout << "Autor: ";
+        cin >> objeto.autor;
+        cout << "Editora: ";
+        cin >> objeto.editora;
+        vincularLivros(objeto.listaLivros, objeto.listaLivros);
+
+    } else if constexpr (is_same<T, Revista>::value) {
+        cout << "Matrícula: ";
+        cin >> objeto.matricula;
+        cout << "Editora: ";
+        cin >> objeto.editora;
+    } else if constexpr (is_same<T, Autor>::value) {
+        cout << "Matrícula: ";
+        cin >> objeto.matricula;
+    } else if constexpr (is_same<T, Editora>::value) {
+        cout << "Matrícula: ";
+        cin >> objeto.matricula;
+    } else if constexpr (is_same<T, Usuario>::value) {
+        cout << "Matrícula: ";
+        cin >> objeto.matricula;
+    }
+    return objeto;
+}
+
+template<typename T>
+bool RemoverElemento(Lista<T> &lista, int id) {
+    No<T> *atual = lista.inicio;
+    No<T> *anterior = nullptr;
+
+    while (atual != nullptr) {
+        if (atual->valor.id == id) {
+            if (anterior == nullptr) {
+                // O elemento a ser removido está no início da lista
+                lista.inicio = atual->proximo;
+            } else {
+                anterior->proximo = atual->proximo;
+            }
+
+            delete atual;
+            cout << "Elemento removido com sucesso." << endl;
+            return true;
+        }
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    cout << "Elemento não encontrado na lista." << endl;
+    return false;
+}
+
+template<typename T>
+void mostrarLista(Lista<T> lista) {
+    if (lista.inicio == nullptr) cout << "\t\t|-> vazia" << endl;
+
+    No<T> *aux = lista.inicio;
+    while (aux != nullptr) {
+
+        cout << "\t________________________________________________: " << endl;
+        cout << "\t\t|->Matricula:" << aux->valor.matricula << " - ";
+        cout << "\t\t| Titulo: " << aux->valor.nome << " | Assunto: " << aux->valor.extra << endl;
+        cout << "\t\t|________________________________________________: " << endl;
+
+        aux = aux->proximo;
+        cout << endl;
+    }
+}
+
+void vincularLivrosAutor(Lista<Livro> &listaLivros, Lista<Autor> &listaAutores) {
+    No<Livro> *livroAtual = listaLivros.inicio;
+    while (livroAtual != nullptr) {
+        No<Autor> *autorAtual = listaAutores.inicio;
+        while (autorAtual != nullptr) {
+            if (autorAtual->valor.matricula == livroAtual->valor.idAutor) {
+                autorAtual->valor.listaLivros = listaLivros;
+                break;
+            }
+            autorAtual = autorAtual->proximo;
+        }
+        livroAtual = livroAtual->proximo;
+    }
+}
+
+void vincularRevistasEditora(Lista<Revista> &listaRevistas, Lista<Editora> &listaEditoras) {
+    No<Revista> *revistaAtual = listaRevistas.inicio;
+    while (revistaAtual != nullptr) {
+        No<Editora> *editoraAtual = listaEditoras.inicio;
+        while (editoraAtual != nullptr) {
+            if (editoraAtual->valor.matricula == revistaAtual->valor.editora) {
+                editoraAtual->valor.listaRevistas = listaRevistas;
+                break;
+            }
+            editoraAtual = editoraAtual->proximo;
+        }
+        revistaAtual = revistaAtual->proximo;
+    }
+}
+
+void mostrarLivrosAutores(Lista<Livro> &listaLivros, Lista<Autor> listaAutores) {
+    if (listaLivros.inicio == nullptr || listaAutores.inicio == nullptr) {
+        cout << "A lista de livros ou a lista de autores está vazia." << endl;
+        return;
+    }
+
+    No<Livro> *livroAux = listaLivros.inicio;
+    while (livroAux != nullptr) {
+        int idAutor = livroAux->valor.idAutor;
+        No<Autor> *autorAux = buscarLista(listaAutores, idAutor);
+        if (autorAux != nullptr) {
+            cout << "Livro: " << livroAux->valor.nome << " | Autor: " << autorAux->valor.nome << endl;
+        } else {
+            cout << "Livro: " << livroAux->valor.nome << " | Editora: " << livroAux->valor.editora << endl;
+        }
+        livroAux = livroAux->proximo;
+    }
+}
+
+void vincularLivrosAutores(Lista<Livro> *listaLivros, Lista<Autor> *listaAutores) {
+    No<Livro> *livroAtual = listaLivros->inicio;
+    while (livroAtual != nullptr) {
+        int idAutor = livroAtual->valor.idAutor;
+        No<Autor> *autorAtual = listaAutores->inicio;
+        while (autorAtual != nullptr) {
+            if (autorAtual->valor.matricula == idAutor) {
+                inserir(livroAtual, autorAtual->valor.listaLivros);
+                break;
+            }
+            autorAtual = autorAtual->proximo;
+        }
+        livroAtual = livroAtual->proximo;
+    }
+}
+
+// Função para mostrar os livros/revistas de um autor ou editora
+void RelatorioLivRevAutEdi(Lista<Livro> listaLivros[], Lista<Revista> listaRevistas[], Lista<Autor> listaAutores[],
+                           Lista<Editora> listaEditoras[]) {
+
+}
+
+void retirarLivro(Usuario &usuario, Livro &livro, Data &data1) {
+
+    soma7dias(data1);
+
+    usuario.livroRetirado->dataRetirada.dia = data1.dia;
+    usuario.livroRetirado->dataRetirada.mes = data1.mes;
+    usuario.livroRetirado->dataRetirada.ano = data1.ano;
+
+    cout << "Livro retirado com sucesso!" << endl;
+    cout << "Data de retirada: " << usuario.livroRetirado->dataRetirada.dia << "/"
+              << usuario.livroRetirado->dataRetirada.mes << "/" << usuario.livroRetirado->dataRetirada.ano << endl;
+}
+
+void retirarRevista(Usuario &usuario, Revista &revista, Data &data1) {
+
+    soma7dias(data1);
+
+    usuario.listaRevistas->dataRetirada.dia = data1.dia;
+    usuario.listaRevistas->dataRetirada.mes = data1.mes;
+    usuario.listaRevistas->dataRetirada.ano = data1.ano;
+
+    cout << "Revista retirada com sucesso!" << endl;
+    cout << "Data de retirada: " << usuario.listaRevistas->dataRetirada.dia << "/"
+              << usuario.listaRevistas->dataRetirada.mes << "/" << usuario.listaRevistas->dataRetirada.ano << endl;
+}
 
